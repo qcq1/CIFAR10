@@ -35,6 +35,7 @@ def DrawImageTxt(imageFile, targetImageFile, txtnum):
 
 
 if __name__=='__main__':
+    print("通过训练好的模型识别十种事物：飞机,汽车,鸟,猫,鹿,狗,青蛙,马,船,卡车")
     device = 'cuda'
     models=[]
     i=1
@@ -71,7 +72,7 @@ if __name__=='__main__':
         if imgs.__len__() == 0:
             print('img文件夹中没有图片')
         else:
-            select = int(input('选择一个测试图片\n'))
+            select = int(input('选择一个测试图片,\n'))
             image_path = imgs[select-1]
             image_name,image_type = image_path.split('.')
             targetImageFile=image_name+'_pre.png'
