@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 CIFAR10
 model
+logs
 .idea
 .Python
 build/

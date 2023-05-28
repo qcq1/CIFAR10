@@ -15,6 +15,7 @@ def readImage(img_path='img/test.png'):
     img = Image.open(img_path).convert('RGB')
     transform= torchvision.transforms.Compose([torchvision.transforms.Resize((32,32)),torchvision.transforms.ToTensor()])
     img = transform(img)
+    print(img.shape)
     img = torch.reshape(img, (1, 3, 32, 32))
     return img
 
@@ -36,17 +37,19 @@ def DrawImageTxt(imageFile, targetImageFile, txtnum):
 if __name__=='__main__':
     device = 'cuda'
     models=[]
+    i=1
     for root, dirs, files in os.walk('model'):
         for file in files:
             if file.__contains__('.pth'):
-                file_path=root+'\\'+file
+                file_path=root+'/'+file
                 models.append(file_path)
-                print('1.'+file)
+                print(f'{i}.'+file)
+                i+=1
     if models.__len__()==0:
-        print('没有pth模型文件')
+        print('model文件夹中没有pth模型文件')
     else:
         select = int(input('选择一个模型\n'))
-        model_path=models[select]
+        model_path=models[select-1]
         if model_path.__contains__('VGG16'):
             qcq_test=QCQ(vgg)
         elif model_path.__contains__('RestNet18'):
@@ -55,21 +58,34 @@ if __name__=='__main__':
             print('选择的模型名称中既不包含"VGG16"，也不包含"RestNet18"')
 
         qcq_test.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
-        image = 'img/test' #修改这里以更改测试图片
-        imageType = '.png'
-        imageFile=image+imageType
-        targetImageFile = image+'_pre.png'
-        img=readImage(imageFile)
-        qcq_test.eval()
-        with torch.no_grad():
-            output = qcq_test(img)
-            pre=output.argmax(1)
-            txtnum = CIFAR10_class[pre.item()]
-            DrawImageTxt(imageFile, targetImageFile, txtnum)
-            print(output)
-            print(pre)
-            print(txtnum)
-        Image.open(targetImageFile).show()
+
+        imgs=[]
+        i=1
+        for root, dirs, files in os.walk('img'):
+            for file in files:
+                if file.__contains__('.png') or file.__contains__('.jpg'):
+                    file_path = root + '/' + file
+                    imgs.append(file_path)
+                    print(f'{i}.' + file)
+                    i+=1
+        if imgs.__len__() == 0:
+            print('img文件夹中没有图片')
+        else:
+            select = int(input('选择一个测试图片\n'))
+            image_path = imgs[select-1]
+            image_name,image_type = image_path.split('.')
+            targetImageFile=image_name+'_pre.png'
+            img=readImage(image_path)
+            qcq_test.eval()
+            with torch.no_grad():
+                output = qcq_test(img)
+                pre=output.argmax(1)
+                txtnum = CIFAR10_class[pre.item()]
+                DrawImageTxt(image_path, targetImageFile, txtnum)
+                print(output)
+                print(pre)
+                print(txtnum)
+            Image.open(targetImageFile).show()
 
 
 
