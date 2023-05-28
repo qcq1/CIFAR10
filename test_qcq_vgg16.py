@@ -1,3 +1,5 @@
+import os
+
 import PIL
 import torchvision.transforms
 from PIL import Image
@@ -33,28 +35,41 @@ def DrawImageTxt(imageFile, targetImageFile, txtnum):
 
 if __name__=='__main__':
     device = 'cuda'
-    model_path = 'model/'+input('输入model下一个模型的文件名，如VGG16_10_epoch\n')+'.pth'
-    if model_path.__contains__('VGG16'):
-        qcq_test=QCQ(vgg)
-    elif model_path.__contains__('RestNet18'):
-        qcq_test=ResNet18()
+    models=[]
+    for root, dirs, files in os.walk('model'):
+        for file in files:
+            if file.__contains__('.pth'):
+                file_path=root+'\\'+file
+                models.append(file_path)
+                print('1.'+file)
+    if models.__len__()==0:
+        print('没有pth模型文件')
+    else:
+        select = int(input('选择一个模型\n'))
+        model_path=models[select]
+        if model_path.__contains__('VGG16'):
+            qcq_test=QCQ(vgg)
+        elif model_path.__contains__('RestNet18'):
+            qcq_test=ResNet18()
+        else:
+            print('选择的模型名称中既不包含"VGG16"，也不包含"RestNet18"')
 
-    qcq_test.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
-    image = 'img/test' #修改这里以更改测试图片
-    imageType = '.png'
-    imageFile=image+imageType
-    targetImageFile = image+'_pre.png'
-    img=readImage(imageFile)
-    qcq_test.eval()
-    with torch.no_grad():
-        output = qcq_test(img)
-        pre=output.argmax(1)
-        txtnum = CIFAR10_class[pre.item()]
-        DrawImageTxt(imageFile, targetImageFile, txtnum)
-        print(output)
-        print(pre)
-        print(txtnum)
-
+        qcq_test.load_state_dict(torch.load(model_path, map_location=torch.device(device)))
+        image = 'img/test' #修改这里以更改测试图片
+        imageType = '.png'
+        imageFile=image+imageType
+        targetImageFile = image+'_pre.png'
+        img=readImage(imageFile)
+        qcq_test.eval()
+        with torch.no_grad():
+            output = qcq_test(img)
+            pre=output.argmax(1)
+            txtnum = CIFAR10_class[pre.item()]
+            DrawImageTxt(imageFile, targetImageFile, txtnum)
+            print(output)
+            print(pre)
+            print(txtnum)
+        Image.open(targetImageFile).show()
 
 
 
