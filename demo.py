@@ -65,10 +65,11 @@ if __name__=='__main__':
         for root, dirs, files in os.walk('img'):
             for file in files:
                 if file.__contains__('.png') or file.__contains__('.jpg'):
-                    file_path = root + '/' + file
-                    imgs.append(file_path)
-                    print(f'{i}.' + file)
-                    i+=1
+                    if not file.__contains__('pre'):
+                        file_path = root + '/' + file
+                        imgs.append(file_path)
+                        print(f'{i}.' + file)
+                        i+=1
         if imgs.__len__() == 0:
             print('img文件夹中没有图片')
         else:
