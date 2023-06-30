@@ -1,8 +1,8 @@
-
 from torch import nn
 
-
 cfg = {'VGG16': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M']}
+
+
 class QCQ(nn.Module):
 
     def __init__(self, vgg):
@@ -39,6 +39,3 @@ class QCQ(nn.Module):
 
         layers += [nn.AvgPool2d(kernel_size=1, stride=1)]
         return nn.Sequential(*layers)
-
-
-
